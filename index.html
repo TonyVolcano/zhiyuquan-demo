@@ -1041,27 +1041,35 @@ function getAvgMatchScore() {
 
 // ==================== 知乎 OAuth 配置 ====================
 const ZHIHU_APP_ID = '261';
+const ZHIHU_APP_KEY = 'f3b623315d894088980c86d17a592e72';
 const ZHIHU_SCOPE = 'zhihu_id,zhihu_profile';
 const OAUTH_STATE = 'xyz_hackathon_2026_' + Date.now();
 
-// 自动检测回调地址（手机端用局域网IP，本地用localhost）
-function getCallbackBase() {
-  const urlParams = new URLSearchParams(window.location.search);
-  // 如果URL中带auth_code参数，说明是回调回来了
-  if (urlParams.get('auth_code')) {
-    return window.location.origin.replace('5188', '5189');
-  }
-  // 正常情况下用当前页面域名
-  return window.location.origin.replace('5188', '5189');
-}
+// 知乎授权地址（第三方应用用）
+const ZHIHU_OAUTH_URL = 'https://www.zhihu.com/oauth/authorize';
+
+// 回调地址配置
+// 本地开发：http://127.0.0.1:5189/callback 或 http://192.168.x.x:5189/callback
+// GitHub Pages 演示：需部署独立的回调服务器
+const CALLBACK_URL = encodeURIComponent('http://192.168.100.26:5189/callback');
 
 // ==================== 业务逻辑 ====================
 function handleZhihuAuth() {
-  // Demo 模式：直接跳转到画像生成页（无需真实知乎 OAuth）
-  showToast('Demo 模式：正在进入 AI 画像生成...');
+  // 构建知乎 OAuth 授权 URL
+  const oauthUrl =
+    ZHIHU_OAUTH_URL +
+    '?client_id=' + ZHIHU_APP_ID +
+    '&response_type=code' +
+    '&redirect_uri=' + CALLBACK_URL +
+    '&scope=' + ZHIHU_SCOPE +
+    '&state=' + OAUTH_STATE;
+
+  showToast('正在跳转知乎授权...');
+  sessionStorage.setItem('oauth_state', OAUTH_STATE);
+
+  // 跳转到知乎授权页
   setTimeout(() => {
-    router.navigate('profile-gen');
-    startProfileGen();
+    window.location.href = oauthUrl;
   }, 800);
 }
 
@@ -1070,17 +1078,22 @@ function checkOAuthCallback() {
   const urlParams = new URLSearchParams(window.location.search);
   const authCode = urlParams.get('auth_code');
   const state = urlParams.get('state');
-  
+
   if (authCode) {
-    // 回调回来了，显示授权成功并继续流程
+    // 回调回来了
     const savedState = sessionStorage.getItem('oauth_state');
-    if (state && savedState && state.startsWith('xyz_hackathon_2026_')) {
+    if (state && savedState && state === OAUTH_STATE) {
       // state 校验通过
-      currentUser.zihuAuthorized = true;
-      router.navigate('profile-gen');
-      startProfileGen();
+      showToast('授权成功，正在生成画像...');
       // 清理 URL 参数
       history.replaceState(null, '', window.location.pathname);
+      // 延迟进入画像生成，确保 toast 显示
+      setTimeout(() => {
+        router.navigate('profile-gen');
+        startProfileGen();
+      }, 500);
+    } else {
+      showToast('state 校验失败，请重试');
     }
   }
 }
