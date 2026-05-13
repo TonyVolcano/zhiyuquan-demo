@@ -1,3 +1,5 @@
+---
+---
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -29,6 +31,11 @@
   <style>
     * { font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: #F8F9FB; min-height: 100vh; overflow-x: hidden; }
+    #app:empty::after {
+      content: '页面加载中，请稍候...';
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; color: #86909C; font-size: 16px;
+    }
     ::-webkit-scrollbar { width: 0; }
     .page { display: none; min-height: 100vh; }
     .page.active { display: flex; flex-direction: column; animation: fadeIn 0.3s ease; }
