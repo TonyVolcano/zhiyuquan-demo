@@ -1,3 +1,5 @@
+---
+---
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1254,6 +1256,57 @@ const app = Vue.createApp({
       activeTribeTab: state.activeTribeTab,
       chatInput: '',
     };
+  },
+  methods: {
+    getTagClass(tag) {
+      const map = {
+        '理性考据': 'bg-blue-100 text-blue-600',
+        '干货输出': 'bg-green-100 text-green-600',
+        '脑洞创意': 'bg-purple-100 text-purple-600',
+        '情绪共鸣': 'bg-amber-100 text-amber-600',
+      };
+      return map[tag] || 'bg-gray-100 text-gray-600';
+    },
+    getMatchTypeName(type) {
+      const map = { sync: '同频', diverse: '破圈', topic: '热榜' };
+      return map[type] || type;
+    },
+    getMatchTypeTag(type) {
+      const map = {
+        sync: 'bg-blue-100 text-blue-600',
+        diverse: 'bg-purple-100 text-purple-600',
+        topic: 'bg-amber-100 text-amber-600',
+      };
+      return map[type] || 'bg-gray-100 text-gray-600';
+    },
+    getAvgMatchScore() {
+      return Math.round(matchedUsers.reduce((sum, u) => sum + u.matchScore, 0) / matchedUsers.length);
+    },
+    showUserCard(user) {
+      showToast(user.name + ' · 匹配度 ' + user.matchScore + '%');
+    },
+    openTribe(tribe) {
+      router.navigate('tribe');
+    },
+    previewTribe(tribe) {
+      tribeData.name = tribe.name;
+      tribeData.icon = tribe.icon;
+      tribeData.bg = tribe.bg;
+      tribeData.desc = tribe.desc;
+      state.selectedMatchType = tribe.type;
+      this.selectedMatchType = tribe.type;
+      router.navigate('match-result');
+    },
+    switchTribeTab(tabId) {
+      state.activeTribeTab = tabId;
+      this.activeTribeTab = tabId;
+    },
+    sendMessage() {
+      sendMessage();
+    },
+    answerIcebreaker(btn) {
+      answerIcebreaker(btn);
+    },
   }
 });
 
