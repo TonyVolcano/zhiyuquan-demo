@@ -1050,8 +1050,8 @@ const ZHIHU_OAUTH_URL = 'https://www.zhihu.com/oauth/authorize';
 
 // 回调地址配置
 // 本地开发：http://127.0.0.1:5189/callback 或 http://192.168.x.x:5189/callback
-// GitHub Pages 演示：需部署独立的回调服务器
-const CALLBACK_URL = encodeURIComponent('http://192.168.100.26:5189/callback');
+// GitHub Pages 演示：使用 localtunnel 穿透公网
+const CALLBACK_URL = encodeURIComponent('https://kind-pants-shop.loca.lt/callback');
 
 // ==================== 业务逻辑 ====================
 function handleZhihuAuth() {
